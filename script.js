@@ -7,6 +7,7 @@ generateBtn.addEventListener("click", () => {
     const background = document.getElementById("background").value.trim();
     const logoInput = document.getElementById("logo");
 
+    // Validate required fields
     if (!tokenName || !ticker) {
         alert("Please fill out both Token Name and Ticker.");
         return;
@@ -17,32 +18,33 @@ generateBtn.addEventListener("click", () => {
         return;
     }
 
+    const data = {
+        tokenName,
+        ticker,
+        twitter,
+        telegram,
+        website,
+        background,
+    };
+
+    // Handle logo upload
     if (logoInput.files && logoInput.files[0]) {
         const reader = new FileReader();
         reader.onload = function (e) {
-            const logoDataURL = e.target.result;
-            const queryParams = new URLSearchParams({
-                tokenName,
-                ticker,
-                twitter,
-                telegram,
-                website,
-                background,
-                logo: encodeURIComponent(logoDataURL),
-            });
-            window.location.href = `generated.html?${queryParams.toString()}`;
+            data.logo = e.target.result; // Save the logo as a base64 string
+
+            // Save data to localStorage and redirect
+            localStorage.setItem("memeCoinData", JSON.stringify(data));
+            window.location.href = "generated.html";
         };
 
         reader.readAsDataURL(logoInput.files[0]);
     } else {
-        const queryParams = new URLSearchParams({
-            tokenName,
-            ticker,
-            twitter,
-            telegram,
-            website,
-            background,
-        });
-        window.location.href = `generated.html?${queryParams.toString()}`;
+        // Proceed without a logo
+        data.logo = null;
+
+        // Save data to localStorage and redirect
+        localStorage.setItem("memeCoinData", JSON.stringify(data));
+        window.location.href = "generated.html";
     }
 });
