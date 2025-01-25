@@ -1,4 +1,7 @@
-generateBtn.addEventListener("click", () => {
+const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dn5qjgaio/image/upload';
+const CLOUDINARY_UPLOAD_PRESET = 'memepage-generator';
+
+generateBtn.addEventListener("click", async () => {
     const tokenName = document.getElementById("tokenName").value.trim();
     const ticker = document.getElementById("ticker").value.trim();
     const twitter = document.getElementById("twitter").value.trim();
@@ -17,32 +20,48 @@ generateBtn.addEventListener("click", () => {
         return;
     }
 
+    let logoURL = null;
     if (logoInput.files && logoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const logoDataURL = e.target.result;
-            const queryParams = new URLSearchParams({
-                tokenName,
-                ticker,
-                twitter,
-                telegram,
-                website,
-                background,
-                logo: encodeURIComponent(logoDataURL),
-            });
-            window.location.href = `generated.html?${queryParams.toString()}`;
-        };
-
-        reader.readAsDataURL(logoInput.files[0]);
-    } else {
-        const queryParams = new URLSearchParams({
-            tokenName,
-            ticker,
-            twitter,
-            telegram,
-            website,
-            background,
-        });
-        window.location.href = `generated.html?${queryParams.toString()}`;
+        const file = logoInput.files[0];
+        logoURL = await uploadImageToCloudinary(file);
+        if (!logoURL) {
+           alert("Failed to upload image to Cloudinary.")
+           return;
+        }
     }
+    
+    const queryParams = new URLSearchParams({
+        tokenName,
+        ticker,
+        twitter,
+        telegram,
+        website,
+        background,
+        logo: logoURL,
+    });
+    window.location.href = `generated.html?${queryParams.toString()}`;
 });
+
+async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    try {
+        const response = await fetch(CLOUDINARY_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.secure_url;
+        } else {
+            console.error("Cloudinary upload failed:", response.status, await response.text());
+            return null;
+        }
+    } catch (error) {
+        console.error("Error uploading to Cloudinary:", error);
+        return null;
+    }
+}
