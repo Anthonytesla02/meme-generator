@@ -28,43 +28,17 @@ function showUpgradeModal(redirectURL, shortURL) {
         <div class="modal-content">
             <h2>Upgrade Your Account</h2>
             <p>To generate your meme coin landing page, please purchase the product below.</p>
-             <a href="https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}" target="_blank" class="publish-button">Redirect to Buy Me a Coffee</a>
+              <button id="modalRedirectBtn" class="publish-button">Redirect to Buy Me a Coffee</button>
         </div>
     `;
     document.body.appendChild(modal);
-    localStorage.setItem('generatedPageURL', shortURL);
-    // Check if the user is back from Buy Me a Coffee
-    if (document.referrer.includes('buymeacoffee.com')) {
-           showSuccessModal()
-    }
+     document.getElementById('modalRedirectBtn').addEventListener('click', function() {
+          window.location.href = `https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}`;
+     });
+        // Set the redirect URL in Buy Me a Coffee product settings page, replace with the generated url
+     localStorage.setItem('redirectURL', shortURL)
 }
 
-
-// Function to show the modal with the generated URL
-function showSuccessModal() {
-      const shortURL = localStorage.getItem('generatedPageURL');
-      const modal = document.createElement('div');
-      modal.classList.add('modal');
-       modal.innerHTML = `
-          <div class="modal-content">
-              <h2>Your Meme Page is Ready!</h2>
-              <p>Copy your meme page url below</p>
-              <input type="text" value="${shortURL}" id="generatedURL" readonly>
-              <button id="copyButton" >Copy URL</button>
-          </div>
-      `;
-    document.body.appendChild(modal);
-
-    document.getElementById('copyButton').addEventListener('click', function() {
-      const urlInput = document.getElementById('generatedURL');
-      urlInput.select();
-       urlInput.setSelectionRange(0, 99999); // For mobile devices
-      navigator.clipboard.writeText(urlInput.value);
-      alert("URL copied!");
-       document.body.removeChild(modal);
-      localStorage.removeItem('generatedPageURL')
-    });
-}
 
 generateBtn.addEventListener("click", async () => {
     // Disable the button and add a loading class
@@ -120,7 +94,7 @@ generateBtn.addEventListener("click", async () => {
       }
     const docRef = await db.collection("memePages").add(formData);
     const shortId = docRef.id;
-    const shortURL = `${BASE_URL}generated.html#${shortId}`;
+     const shortURL = `${BASE_URL}generated.html#${shortId}`;
     // Remove loading state
     generateBtn.disabled = false; // enable the generate button
     generateBtn.classList.remove("loading");
@@ -153,3 +127,15 @@ async function uploadImageToCloudinary(file) {
         return null;
     }
 }
+
+
+// Check for payment success
+document.addEventListener('DOMContentLoaded', function() {
+    const redirectURL = localStorage.getItem('redirectURL');
+     if (window.location.href.includes('buymeacoffee') && redirectURL) {
+             window.location.href = redirectURL;
+            localStorage.removeItem('redirectURL');
+
+    }
+
+});
