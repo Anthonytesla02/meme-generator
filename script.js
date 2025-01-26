@@ -19,7 +19,6 @@ const BASE_URL = window.location.origin + window.location.pathname.substring(0, 
 //Paystack variables
 const PAYSTACK_PUBLIC_KEY = 'pk_live_9841715ba5385787820ba523c0e6315046fc8a9a';
 const PAYMENT_AMOUNT = 100; //Amount in kobo
-const PAYSTACK_PLAN_CODE = 'PLN_rcanog6vsxeb49w'
 
 
 generateBtn.addEventListener("click", async () => {
@@ -65,10 +64,10 @@ generateBtn.addEventListener("click", async () => {
     const transactionRef =  generateTransactionRef(shortId);
 
     // Create a Paystack payment URL
-     const paystackUrl = `https://checkout.paystack.com/pay/${PAYSTACK_PLAN_CODE}`;
-
+     const paystackUrl = `https://paystack.com/pay/PLN_rcanog6vsxeb49w`;
+    
     // Redirect the user to Paystack
-    const successUrl = `${BASE_URL}generated.html#success?ref=${transactionRef}&id=${shortId}`;
+      const successUrl = `${BASE_URL}generated.html#success?ref=${transactionRef}&id=${shortId}`;
     window.location.href = `${paystackUrl}?reference=${transactionRef}&amount=${PAYMENT_AMOUNT}&callback_url=${successUrl}`;
 });
 async function uploadImageToCloudinary(file) {
