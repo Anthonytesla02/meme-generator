@@ -18,6 +18,7 @@ const CLOUDINARY_UPLOAD_PRESET = 'memepage-generator';
 const BASE_URL = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
 const generateBtn = document.getElementById("generateBtn");
+const buyMeACoffeeProductID = '364445'; // Replace with the actual product ID
 
 // Function to show the modal with redirect button
 function showUpgradeModal(redirectURL) {
@@ -34,7 +35,8 @@ function showUpgradeModal(redirectURL) {
 
 
       document.getElementById("modalRedirectBtn").addEventListener('click', function() {
-          window.location.href = `https://buymeacoffee.com/memepage/e/364445`;
+          window.location.href = `https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}`;
+           localStorage.setItem('redirectHash', redirectURL);
       });
 }
 
