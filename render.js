@@ -40,8 +40,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             landingPage.style.background = "#f9f9f9"; // Default background
         }
 
-         // Generate the "Buy Me a Coffee" URL
-        const buyMeACoffeeURL = `https://www.buymeacoffee.com/memepage?message=Support+for+${encodeURIComponent(tokenName)}`; // Replace with your username
         // Generate the landing page content
         landingPage.innerHTML = `
             <div class="content">
@@ -53,7 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ${telegram ? `<a href="${telegram}" target="_blank" class="button telegram"><i class="fab fa-telegram"></i> Telegram</a>` : ""}
                     ${website ? `<a href="${website}" target="_blank" class="button website"><i class="fas fa-globe"></i> Website</a>` : ""}
                 </div>
-                <a href="${buyMeACoffeeURL}" target="_blank" class="publish-button">Support Us!</a>
             </div>
         `;
     } catch(error){
