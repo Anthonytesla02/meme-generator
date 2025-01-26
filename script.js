@@ -35,8 +35,8 @@ function showUpgradeModal(redirectURL) {
 
 
       document.getElementById("modalRedirectBtn").addEventListener('click', function() {
+          localStorage.setItem('redirectHash', redirectURL);
           window.location.href = `https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}`;
-           localStorage.setItem('redirectHash', redirectURL);
       });
 }
 
@@ -129,13 +129,11 @@ async function uploadImageToCloudinary(file) {
 }
 
 
-// Check for URL parameter to redirect on successful payment
-const urlParams = new URLSearchParams(window.location.search);
-const paymentSuccess = urlParams.get('success');
-if (paymentSuccess === 'true') {
+// Check for payment success
+document.addEventListener('DOMContentLoaded', function() {
     const redirectHash = localStorage.getItem('redirectHash');
-     if(redirectHash){
+    if (redirectHash) {
+       localStorage.removeItem('redirectHash');
        window.location.href = `${BASE_URL}generated.html#${redirectHash}`;
-    localStorage.removeItem('redirectHash');
     }
-}
+});
