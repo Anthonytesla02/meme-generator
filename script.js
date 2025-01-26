@@ -129,10 +129,8 @@ async function uploadImageToCloudinary(file) {
 // Check for payment success
 document.addEventListener('DOMContentLoaded', function() {
     const redirectURL = localStorage.getItem('redirectURL');
-     if (redirectURL && document.referrer.includes('buymeacoffee') ) {
-             window.location.href = redirectURL;
-             localStorage.removeItem('redirectURL');
-
+   if (redirectURL && document.referrer.includes('buymeacoffee')) {
+       window.location.href = redirectURL;
+        localStorage.removeItem('redirectURL');
     }
-
 });
