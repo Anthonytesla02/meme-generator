@@ -17,7 +17,34 @@ const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dn5qjgaio/image/upload';
 const CLOUDINARY_UPLOAD_PRESET = 'memepage-generator';
 const BASE_URL = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
+const generateBtn = document.getElementById("generateBtn");
+
+// Function to show the modal with redirect button
+function showUpgradeModal(redirectURL) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Upgrade Your Account</h2>
+            <p>To generate your meme coin landing page, please purchase the product below.</p>
+            <button id="modalRedirectBtn">Redirect to Buy Me a Coffee</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+
+      document.getElementById("modalRedirectBtn").addEventListener('click', function() {
+          window.location.href = `https://www.buymeacoffee.com/memepage/e/${redirectURL}`;
+      });
+}
+
 generateBtn.addEventListener("click", async () => {
+    // Disable the button and add a loading class
+    generateBtn.disabled = true;
+    generateBtn.classList.add("loading");
+    generateBtn.innerHTML = "Generating...";
+
+
     const tokenName = document.getElementById("tokenName").value.trim();
     const ticker = document.getElementById("ticker").value.trim();
     const twitter = document.getElementById("twitter").value.trim();
@@ -28,11 +55,17 @@ generateBtn.addEventListener("click", async () => {
 
     if (!tokenName || !ticker) {
         alert("Please fill out both Token Name and Ticker.");
+        generateBtn.disabled = false; // enable the generate button
+        generateBtn.classList.remove("loading");
+        generateBtn.innerHTML = "Generate Page";
         return;
     }
 
     if (ticker.length > 5) {
         alert("Ticker should not exceed 5 characters.");
+        generateBtn.disabled = false; // enable the generate button
+        generateBtn.classList.remove("loading");
+         generateBtn.innerHTML = "Generate Page";
         return;
     }
 
@@ -42,6 +75,9 @@ generateBtn.addEventListener("click", async () => {
         logoURL = await uploadImageToCloudinary(file);
         if (!logoURL) {
             alert("Failed to upload image to Cloudinary.");
+            generateBtn.disabled = false; // enable the generate button
+            generateBtn.classList.remove("loading");
+            generateBtn.innerHTML = "Generate Page";
             return;
         }
     }
@@ -57,8 +93,13 @@ generateBtn.addEventListener("click", async () => {
     const docRef = await db.collection("memePages").add(formData);
     const shortId = docRef.id;
     const shortURL = `${BASE_URL}generated.html#${shortId}`;
-    window.location.href = shortURL;
-    alert("Your branded short url is: "+ shortURL);
+    // Remove loading state
+    generateBtn.disabled = false; // enable the generate button
+    generateBtn.classList.remove("loading");
+    generateBtn.innerHTML = "Generate Page";
+
+   //show the redirect modal
+     showUpgradeModal(shortId);
 });
 
 async function uploadImageToCloudinary(file) {
@@ -82,5 +123,17 @@ async function uploadImageToCloudinary(file) {
     } catch (error) {
         console.error("Error uploading to Cloudinary:", error);
         return null;
+    }
+}
+
+
+// Check for URL parameter to redirect on successful payment
+const urlParams = new URLSearchParams(window.location.search);
+const paymentSuccess = urlParams.get('success');
+if (paymentSuccess === 'true') {
+    const redirectHash = localStorage.getItem('redirectHash');
+     if(redirectHash){
+       window.location.href = `${BASE_URL}generated.html#${redirectHash}`;
+    localStorage.removeItem('redirectHash');
     }
 }
