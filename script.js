@@ -34,7 +34,7 @@ function showUpgradeModal(redirectURL) {
 
 
       document.getElementById("modalRedirectBtn").addEventListener('click', function() {
-          window.location.href = `https://www.buymeacoffee.com/memepage/e/${redirectURL}`;
+          window.location.href = `https://buymeacoffee.com/memepage/e/364445`;
       });
 }
 
