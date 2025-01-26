@@ -9,6 +9,7 @@ const firebaseConfig = {
   measurementId: "G-K8VTWD9EXV"
 };
 
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -16,6 +17,10 @@ const db = firebase.firestore();
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dn5qjgaio/image/upload';
 const CLOUDINARY_UPLOAD_PRESET = 'memepage-generator';
 const BASE_URL = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+//Paystack variables
+const PAYSTACK_PUBLIC_KEY = 'pk_live_9841715ba5385787820ba523c0e6315046fc8a9a';
+const PAYMENT_AMOUNT = 100; //Amount in kobo
+
 
 generateBtn.addEventListener("click", async () => {
     const tokenName = document.getElementById("tokenName").value.trim();
@@ -31,7 +36,7 @@ generateBtn.addEventListener("click", async () => {
         return;
     }
 
-    if (ticker.length > 5) {
+    if (ticker.length > 10) {
         alert("Ticker should not exceed 5 characters.");
         return;
     }
@@ -45,22 +50,27 @@ generateBtn.addEventListener("click", async () => {
             return;
         }
     }
-      const formData = {
-          tokenName,
-          ticker,
-          twitter,
-          telegram,
-          website,
-          background,
-          logo: logoURL
-      }
+    const formData = {
+        tokenName,
+        ticker,
+        twitter,
+        telegram,
+        website,
+        background,
+        logo: logoURL
+    }
     const docRef = await db.collection("memePages").add(formData);
     const shortId = docRef.id;
-    const shortURL = `${BASE_URL}generated.html#${shortId}`;
-    window.location.href = shortURL;
-    alert("Your branded short url is: "+ shortURL);
-});
+    // Generate a unique transaction reference
+    const transactionRef =  generateTransactionRef(shortId);
 
+    // Create a Paystack payment URL
+     const paystackUrl = `https://paystack.com/pay/<YOUR_PAYSTACK_PLAN_CODE>`;
+    
+    // Redirect the user to Paystack
+      const successUrl = `${BASE_URL}generated.html#success?ref=${transactionRef}&id=${shortId}`;
+    window.location.href = `${paystackUrl}?reference=${transactionRef}&amount=${PAYMENT_AMOUNT}&callback_url=${successUrl}`;
+});
 async function uploadImageToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -83,4 +93,8 @@ async function uploadImageToCloudinary(file) {
         console.error("Error uploading to Cloudinary:", error);
         return null;
     }
+}
+
+function generateTransactionRef(shortId) {
+  return `meme_${shortId}_${Date.now()}`;
 }
