@@ -141,3 +141,37 @@ footer {
         font-size: 1.5rem;
     }
 }
+
+.short-url-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.short-url-container p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.short-url-container input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 70%;
+    margin-right: 10px;
+}
+
+.short-url-container button {
+     display: inline-block;
+     width: auto;
+    padding: 10px 15px;
+     background-color: #4CAF50;
+     color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.short-url-container button:hover{
+ background-color: #45a049;
+}
