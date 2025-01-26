@@ -32,35 +32,38 @@ function showUpgradeModal(redirectURL, shortURL) {
         </div>
     `;
     document.body.appendChild(modal);
-       // Check if the user is back from Buy Me a Coffee
-      const urlParams = new URLSearchParams(window.location.search);
-      if (document.referrer.includes('buymeacoffee.com') ) {
-        showSuccessModal(shortURL);
+    localStorage.setItem('generatedPageURL', shortURL);
+    // Check if the user is back from Buy Me a Coffee
+    if (document.referrer.includes('buymeacoffee.com')) {
+           showSuccessModal()
     }
 }
 
-// Function to show the modal with the generated URL
-function showSuccessModal(shortURL) {
-  const modal = document.createElement('div');
-  modal.classList.add('modal');
-  modal.innerHTML = `
-      <div class="modal-content">
-          <h2>Your Meme Page is Ready!</h2>
-          <p>Copy your meme page url below</p>
-          <input type="text" value="${shortURL}" id="generatedURL" readonly>
-           <button id="copyButton" >Copy URL</button>
-      </div>
-  `;
-  document.body.appendChild(modal);
 
-  document.getElementById('copyButton').addEventListener('click', function() {
-    const urlInput = document.getElementById('generatedURL');
-    urlInput.select();
-     urlInput.setSelectionRange(0, 99999); // For mobile devices
+// Function to show the modal with the generated URL
+function showSuccessModal() {
+      const shortURL = localStorage.getItem('generatedPageURL');
+      const modal = document.createElement('div');
+      modal.classList.add('modal');
+       modal.innerHTML = `
+          <div class="modal-content">
+              <h2>Your Meme Page is Ready!</h2>
+              <p>Copy your meme page url below</p>
+              <input type="text" value="${shortURL}" id="generatedURL" readonly>
+              <button id="copyButton" >Copy URL</button>
+          </div>
+      `;
+    document.body.appendChild(modal);
+
+    document.getElementById('copyButton').addEventListener('click', function() {
+      const urlInput = document.getElementById('generatedURL');
+      urlInput.select();
+       urlInput.setSelectionRange(0, 99999); // For mobile devices
       navigator.clipboard.writeText(urlInput.value);
-    alert("URL copied!");
-     document.body.removeChild(modal);
-  });
+      alert("URL copied!");
+       document.body.removeChild(modal);
+      localStorage.removeItem('generatedPageURL')
+    });
 }
 
 generateBtn.addEventListener("click", async () => {
