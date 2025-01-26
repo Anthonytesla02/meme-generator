@@ -28,15 +28,12 @@ function showUpgradeModal(redirectURL, shortURL) {
         <div class="modal-content">
             <h2>Upgrade Your Account</h2>
             <p>To generate your meme coin landing page, please purchase the product below.</p>
-              <button id="modalRedirectBtn" class="publish-button">Redirect to Buy Me a Coffee</button>
+             <a href="https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}" target="_blank" class="publish-button">Redirect to Buy Me a Coffee</a>
         </div>
     `;
     document.body.appendChild(modal);
-     document.getElementById('modalRedirectBtn').addEventListener('click', function() {
-          window.location.href = `https://www.buymeacoffee.com/memepage/e/${buyMeACoffeeProductID}`;
-     });
-        // Set the redirect URL in Buy Me a Coffee product settings page, replace with the generated url
-     localStorage.setItem('redirectURL', shortURL)
+        localStorage.setItem('redirectURL', shortURL);
+
 }
 
 
@@ -132,9 +129,9 @@ async function uploadImageToCloudinary(file) {
 // Check for payment success
 document.addEventListener('DOMContentLoaded', function() {
     const redirectURL = localStorage.getItem('redirectURL');
-     if (window.location.href.includes('buymeacoffee') && redirectURL) {
+     if (redirectURL && document.referrer.includes('buymeacoffee') ) {
              window.location.href = redirectURL;
-            localStorage.removeItem('redirectURL');
+             localStorage.removeItem('redirectURL');
 
     }
 
