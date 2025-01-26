@@ -94,6 +94,27 @@ button {
 button:hover {
     background-color: #45a049;
 }
+button.loading{
+      background-color: #ccc; /* Greyed out */
+       cursor: not-allowed;
+}
+button.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 10px;
+    border: 2px solid white;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    transform: translateY(-50%);
+}
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+}
 
 footer {
     text-align: center;
@@ -174,4 +195,30 @@ footer {
 }
 .short-url-container button:hover{
  background-color: #45a049;
+}
+.modal{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: center;
+}
+.modal-content h2 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+.modal-content p {
+   margin-bottom: 20px;
 }
