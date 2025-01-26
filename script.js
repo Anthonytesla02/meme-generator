@@ -21,7 +21,7 @@ const generateBtn = document.getElementById("generateBtn");
 const buyMeACoffeeProductID = '364445'; // Replace with the actual product ID
 
 // Function to show the modal with redirect button
-function showUpgradeModal(redirectURL) {
+function showUpgradeModal(redirectURL, shortURL) {
     const modal = document.createElement('div');
     modal.classList.add('modal');
     modal.innerHTML = `
@@ -32,6 +32,35 @@ function showUpgradeModal(redirectURL) {
         </div>
     `;
     document.body.appendChild(modal);
+       // Check if the user is back from Buy Me a Coffee
+      const urlParams = new URLSearchParams(window.location.search);
+      if (document.referrer.includes('buymeacoffee.com') ) {
+        showSuccessModal(shortURL);
+    }
+}
+
+// Function to show the modal with the generated URL
+function showSuccessModal(shortURL) {
+  const modal = document.createElement('div');
+  modal.classList.add('modal');
+  modal.innerHTML = `
+      <div class="modal-content">
+          <h2>Your Meme Page is Ready!</h2>
+          <p>Copy your meme page url below</p>
+          <input type="text" value="${shortURL}" id="generatedURL" readonly>
+           <button id="copyButton" >Copy URL</button>
+      </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('copyButton').addEventListener('click', function() {
+    const urlInput = document.getElementById('generatedURL');
+    urlInput.select();
+     urlInput.setSelectionRange(0, 99999); // For mobile devices
+      navigator.clipboard.writeText(urlInput.value);
+    alert("URL copied!");
+     document.body.removeChild(modal);
+  });
 }
 
 generateBtn.addEventListener("click", async () => {
@@ -95,7 +124,7 @@ generateBtn.addEventListener("click", async () => {
     generateBtn.innerHTML = "Generate Page";
 
    //show the redirect modal
-     showUpgradeModal(shortId);
+     showUpgradeModal(shortId, shortURL);
 });
 
 async function uploadImageToCloudinary(file) {
