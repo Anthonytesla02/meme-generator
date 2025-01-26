@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ${telegram ? `<a href="${telegram}" target="_blank" class="button telegram"><i class="fab fa-telegram"></i> Telegram</a>` : ""}
                     ${website ? `<a href="${website}" target="_blank" class="button website"><i class="fas fa-globe"></i> Website</a>` : ""}
                 </div>
-                <a href="${buyMeACoffeeURL}" target="_blank" class="publish-button">Support Us!</a>
+                 <a href="${buyMeACoffeeURL}" target="_blank" class="publish-button">Support Us!</a>
             </div>
         `;
     } catch(error){
