@@ -15,59 +15,92 @@ const db = firebase.firestore();
 
 document.addEventListener("DOMContentLoaded", async () => {
     const landingPage = document.getElementById("landingPage");
-    const hash = window.location.hash.substring(1); // Remove the '#'
-    if (!hash) {
-        landingPage.innerHTML = `<div class="content"><h1>Error: Invalid URL. Please generate a new page from the index page.</h1></div>`;
-        return;
+    const params = new URLSearchParams(window.location.hash.substring(1));
+     const ref = params.get("ref");
+     const id = params.get("id");
+     if (window.location.hash.startsWith('#success')){
+          if (ref && id){
+               const isVerified = await verifyPayment(ref);
+                 if (isVerified){
+                      try{
+                         const doc = await db.collection("memePages").doc(id).get();
+                          if (!doc.exists) {
+                            landingPage.innerHTML = `<div class="content"><h1>Error: Page not found. Please generate a new page from the index page.</h1></div>`;
+                                  return;
+                          }
+                         const formData = doc.data();
+                         const { tokenName, ticker, twitter, telegram, website, background, logo } = formData;
+                                 // Set background
+                            if (background) {
+                                landingPage.style.background = background.startsWith("#") ? background : `url(${background})`;
+                                landingPage.style.backgroundSize = "cover";
+                                landingPage.style.backgroundPosition = "center";
+                            } else {
+                                landingPage.style.background = "#f9f9f9"; // Default background
+                            }
+
+                         // Generate the landing page content
+                          landingPage.innerHTML = `
+                                <div class="content">
+                                      <img src="${logo || 'default-logo.png'}" alt="${tokenName || 'Meme Coin'} Logo" class="logo">
+                                      <h1>${tokenName || 'Meme Coin'} (${ticker || 'TICK'})</h1>
+                                      <p>The future of meme coins starts here!</p>
+                                      <div class="links">
+                                          ${twitter ? `<a href="${twitter}" target="_blank" class="button twitter"><i class="fab fa-twitter"></i> Twitter</a>` : ""}
+                                          ${telegram ? `<a href="${telegram}" target="_blank" class="button telegram"><i class="fab fa-telegram"></i> Telegram</a>` : ""}
+                                          ${website ? `<a href="${website}" target="_blank" class="button website"><i class="fas fa-globe"></i> Website</a>` : ""}
+                                       </div>
+                                      <div class="short-url-container">
+                                         <p>Your Short URL:</p>
+                                          <input type="text" id="shortUrlInput" value="${window.location.href.split("#")[0]}#${id}" readonly>
+                                          <button id="copyButton">Copy URL</button>
+                                      </div>
+                                  </div>
+                              `;
+                               const copyButton = document.getElementById("copyButton");
+                               const shortUrlInput = document.getElementById('shortUrlInput');
+                               copyButton.addEventListener("click", () => {
+                                   shortUrlInput.select();
+                                   document.execCommand('copy');
+                                   window.getSelection().removeAllRanges(); // Deselect the text after copy
+                                   copyButton.textContent = 'Copied!';
+                                  setTimeout(() => {
+                                        copyButton.textContent = 'Copy URL';
+                                  }, 1000);
+                             });
+                         }
+                         catch(error){
+                              console.error("Error fetching document:", error);
+                              landingPage.innerHTML = `<div class="content"><h1>Error: Failed to load the page data. Please try again or generate a new page.</h1></div>`;
+                        }
+                }
+                else{
+                     landingPage.innerHTML = `<div class="content"><h1>Error: Payment verification failed. Please try again.</h1></div>`;
+                }
+
+          }
+     }
+    else{
+            landingPage.innerHTML = `<div class="content"><h1>Error: Invalid URL. Please generate a new page from the index page.</h1></div>`;
     }
-
-    try {
-        const doc = await db.collection("memePages").doc(hash).get();
-        if (!doc.exists) {
-            landingPage.innerHTML = `<div class="content"><h1>Error: Page not found. Please generate a new page from the index page.</h1></div>`;
-             return;
-        }
-        const formData = doc.data();
-        const { tokenName, ticker, twitter, telegram, website, background, logo } = formData;
-
-
-        // Set background
-        if (background) {
-            landingPage.style.background = background.startsWith("#") ? background : `url(${background})`;
-            landingPage.style.backgroundSize = "cover";
-            landingPage.style.backgroundPosition = "center";
-        } else {
-            landingPage.style.background = "#f9f9f9"; // Default background
-        }
-
-        // Generate the landing page content
-        landingPage.innerHTML = `
-            <div class="content">
-                <img src="${logo || 'default-logo.png'}" alt="${tokenName || 'Meme Coin'} Logo" class="logo">
-                <h1>${tokenName || 'Meme Coin'} (${ticker || 'TICK'})</h1>
-                <p>The future of meme coins starts here!</p>
-                <div class="links">
-                    ${twitter ? `<a href="${twitter}" target="_blank" class="button twitter"><i class="fab fa-twitter"></i> Twitter</a>` : ""}
-                    ${telegram ? `<a href="${telegram}" target="_blank" class="button telegram"><i class="fab fa-telegram"></i> Telegram</a>` : ""}
-                    ${website ? `<a href="${website}" target="_blank" class="button website"><i class="fas fa-globe"></i> Website</a>` : ""}
-                </div>
-                <button id="publishBtn" class="publish-button">Publish</button>
-            </div>
-        `;
-    } catch(error){
-        console.error("Error fetching document:", error);
-        landingPage.innerHTML = `<div class="content"><h1>Error: Failed to load the page data. Please try again or generate a new page.</h1></div>`;
-    }
-    // Handle Publish Button
-    const publishBtn = document.getElementById("publishBtn");
-    publishBtn.addEventListener("click", () => {
-        const projectName = prompt("Enter a project name (e.g., memecoin1):");
-        if (projectName) {
-            alert(`Your page will be published as: https://yourusername.github.io/${projectName}`);
-            // Save the generated HTML to GitHub Pages
-            // (This step involves manual upload or an API, explained below)
-        } else {
-            alert("Project name is required to publish.");
-        }
-    });
 });
+
+async function verifyPayment(reference){
+       try {
+            const response = await fetch(
+              `https://api.paystack.co/transaction/verify/${reference}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${'<YOUR_PAYSTACK_SECRET_KEY>'}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            const data = await response.json();
+            return data.status;
+       } catch(error) {
+            console.error("Payment Verification Failed:", error);
+            return false
+       }
+}
